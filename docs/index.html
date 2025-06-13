@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Daily Word</title>
+    <style>
+      body { font-family: sans-serif; padding: 2rem; }
+      h1 { font-size: 2rem; margin-bottom: .5rem; }
+      #time, #local-date { font-weight: bold; }
+      #word { font-size: 1.5rem; margin-top: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Today’s Word</h1>
+    <p>Local time: <span id="time">--:--</span></p>
+    <p>Local date: <span id="local-date">Loading…</span></p>
+    <p id="word">Loading word…</p>
+
+    <script>
+      async function updatePage() {
+        const now = new Date();
+
+        const timeString = now.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const dateString = now.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        document.getElementById('time').textContent = timeString;
+        document.getElementById('local-date').textContent = dateString;
+
+        const y = now.getFullYear();
+        const m = now.toLocaleString('en-US', { month: 'long' }).toLowerCase();
+        const d = now.getDate(); 
+
+        const prefix = 'https://cscats.github.io/word-hosting'
+        const path = `${prefix}/${y}/${m}/${d}.txt`;
+        try {
+          const res = await fetch(path);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const word = (await res.text()).trim();
+          document.getElementById('word').textContent = word || "(no word found)";
+        } catch {
+          document.getElementById('word').textContent = "Could not load word.";
+        }
+      }
+
+      updatePage();
+      setInterval(updatePage, 60_000);
+    </script>
+  </body>
+</html>
