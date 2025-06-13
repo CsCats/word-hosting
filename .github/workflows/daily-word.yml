@@ -58,6 +58,11 @@ jobs:
             echo "File not found!"
           fi
 
+      - name: Debug remote & auth
+        run: |
+          git remote -v
+          git push --dry-run
+
       - name: Commit & push if changed
         run: |
           git add docs
