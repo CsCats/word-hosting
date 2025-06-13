@@ -17,6 +17,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
           persist-credentials: true
 
@@ -58,10 +59,16 @@ jobs:
             echo "File not found!"
           fi
 
-      - name: Debug remote & auth
+      - name: Debug show docs tree & git status
         run: |
+          echo "=== docs directory ==="
+          ls -R docs || true
+          echo
+          echo "=== git status ==="
+          git status
+          echo
+          echo "=== git remote -v ==="
           git remote -v
-          git push --dry-run
 
       - name: Commit & push if changed
         run: |
