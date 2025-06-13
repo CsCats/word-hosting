@@ -43,6 +43,16 @@ jobs:
           TARGET="docs/${{ steps.date.outputs.year }}/${{ steps.date.outputs.month }}"
           mkdir -p "$TARGET"
           echo "${{ steps.pick.outputs.word }}" > "$TARGET/${{ steps.date.outputs.day }}.txt"
+      
+      - name: Debug show new file
+        run: |
+          TARGET="docs/${{ steps.date.outputs.year }}/${{ steps.date.outputs.month }}/${{ steps.date.outputs.day }}.txt"
+          echo "Looking at $TARGET:"
+          if [ -f "$TARGET" ]; then
+            cat "$TARGET"
+          else
+            echo "File not found!"
+          fi
 
       - name: Commit & push if changed
         run: |
