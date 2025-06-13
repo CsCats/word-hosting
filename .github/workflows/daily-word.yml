@@ -1,0 +1,53 @@
+# .github/workflows/daily-word.yml
+name: "Daily Word"
+
+on:
+  schedule:
+    # 9:55 UTC daily → 00:00 local in UTC+10…UTC+14 (refreshes before earliest timezone)
+    - cron: "55 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute target date (UTC+1 day)
+        id: date
+        run: |
+          # we want "tomorrow" in UTC, so that at earliest local midnight
+          YEAR=$(date -u -d "+1 day" +'%Y')
+          MONTH=$(date -u -d "+1 day" +'%B' | tr '[:upper:]' '[:lower:]')
+          DAY=$(date -u -d "+1 day" +'%d' | sed 's/^0//')
+          echo "year=$YEAR"  >> $GITHUB_OUTPUT
+          echo "month=$MONTH" >> $GITHUB_OUTPUT
+          echo "day=$DAY"     >> $GITHUB_OUTPUT
+
+      - name: Pick random word
+        id: pick
+        run: |
+          WORD=$(shuf -n1 common-words.txt)
+          echo "word=$WORD" >> $GITHUB_OUTPUT
+
+      - name: Create daily file
+        run: |
+          TARGET="docs/${{ steps.date.outputs.year }}/${{ steps.date.outputs.month }}"
+          mkdir -p "$TARGET"
+          echo "${{ steps.pick.outputs.word }}" > "$TARGET/${{ steps.date.outputs.day }}.txt"
+
+      - name: Commit & push if changed
+        run: |
+          git add docs
+          git diff --quiet || (
+            git commit -m "Added word ~${{ steps.pick.outputs.word }}~ for ${{ steps.date.outputs.year }}-${{ steps.date.outputs.month }}-${{ steps.date.outputs.day }}"
+            git push
+          )
