@@ -3,8 +3,8 @@ name: "Daily Word"
 
 on:
   schedule:
-    # 9:55 UTC daily → 00:00 local in UTC+10…UTC+14 (refreshes before earliest timezone)
-    - cron: "55 9 * * *"
+    # 9:30 UTC daily → 00:00 local in UTC+10…UTC+14 (refreshes before earliest timezone) (30 mins before)
+    - cron: "30 9 * * *"
   workflow_dispatch:
 
 jobs:
