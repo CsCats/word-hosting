@@ -59,21 +59,17 @@ jobs:
             echo "File not found!"
           fi
 
-      - name: Debug show docs tree & git status
+      - name: Debug git status
         run: |
-          echo "=== docs directory ==="
-          ls -R docs || true
-          echo
           echo "=== git status ==="
           git status
-          echo
-          echo "=== git remote -v ==="
-          git remote -v
 
       - name: Commit & push if changed
         run: |
           git add docs
-          git diff --quiet || (
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
             git commit -m "Added word ~${{ steps.pick.outputs.word }}~ for ${{ steps.date.outputs.year }}-${{ steps.date.outputs.month }}-${{ steps.date.outputs.day }}"
             git push
-          )
+          fi
