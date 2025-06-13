@@ -1,6 +1,9 @@
 # .github/workflows/daily-word.yml
 name: "Daily Word"
 
+permissions:
+  contents: write
+
 on:
   schedule:
     # 9:30 UTC daily → 00:00 local in UTC+10…UTC+14 (refreshes before earliest timezone) (30 mins before)
@@ -15,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Configure Git
         run: |
